@@ -1,0 +1,22 @@
+email_settings:
+  smtp_server: your_smtp_server
+  smtp_port: 587 # or your SMTP port
+  sender_email: your_email@example.com
+  sender_password: your_email_password
+
+users:
+  - name: User One
+    ph_nmbr: '1234567890' # Phone number as a string
+    carrier: Verizon # e.g., AT&T, Boost Mobile, Cricket, Verizon, T-Mobile
+    zipcodes:
+      - '10001'
+      - '90210'
+  - name: User Two
+    ph_nmbr: '0987654321'
+    carrier: T-Mobile
+    zipcodes:
+      - '60601'
+      - '75001'
+
+sms_settings:
+  "AT&T": ""
