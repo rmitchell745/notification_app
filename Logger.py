@@ -3,7 +3,7 @@ from logging.handlers import TimedRotatingFileHandler
 import os
 
 # Create a logs directory if it doesn't exist
-log_dir = "logs"
+log_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),"logs")
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 

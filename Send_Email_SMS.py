@@ -6,7 +6,7 @@ from Logger import logger
 class EmailConfig:
     __instance = None
 
-    def __new__(cls):
+    def __new__(cls, config):
         if cls.__instance is None:
             cls.__instance = super(EmailConfig, cls).__new__(cls)
             logger.info("EmailConfig singleton instance created.")

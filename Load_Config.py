@@ -8,7 +8,7 @@ from Logger import logger # Import the logger
 def load_config():
   cwd = os.getcwd()
 
-  config_path = os.path.join(cwd, "..", "config",'weather_config.yml')
+  config_path = os.path.join(cwd,"Config",'weather_config.yml')
 
   try:
       with open(config_path, 'r') as file:

@@ -5,7 +5,7 @@ import smtplib
 import yaml
 import os
 from Logger import logger
-
+import json
 #main python module that is scheduled to run.
 
 logger.info("Application started.")
@@ -76,6 +76,7 @@ for user in user_list:
     messages[user] = message # Associate to user
 
 logger.info("Finished generating messages.")
+logger.info(json.dumps(human_readable_data, indent=2))
 
 #send the messages
 if email_sending_possible:
@@ -93,7 +94,7 @@ if email_sending_possible:
             "AT&T": "txt.att.net",
             "Boost Mobile": "sms.myboostmobile.com",
             "Cricket": "sms.mycricket.com",
-            "Verizon": "vtext.com",
+            "Verizon": "vzwpix.com",
             "T-Mobile": "tmomail.net"
         }
 

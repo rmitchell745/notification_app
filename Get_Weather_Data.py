@@ -13,7 +13,7 @@ def get_weather(uniq_zipcodes):
     weather_data = {}
     logger.info(f"Fetching weather data for {len(uniq_zipcodes)} unique zipcodes.")
     for zipcode in uniq_zipcodes:
-        url = f"http://api.openweathermap.org/data/2.5/forecast?zip={zipcode},cnt=3,us&appid={api_key}"
+        url = f"http://api.openweathermap.org/data/2.5/forecast?zip={zipcode},us&units=imperial&cnt=3&appid={api_key}"
         try:
             response = requests.get(url)
             response.raise_for_status()
@@ -37,53 +37,49 @@ def human_readable_weather(weather_data):
             logger.warning(f"Skipping human readable conversion for zipcode {zipcode} due to fetch error.")
             continue
 
+        
+        forecasts = data.get("list", [])
 
-        if 'list' in data and data['list']:
-            for forecast in data['list']:
+        if not forecasts :
+            human_readable_data[zipcode] = {"No forecast data available": ["No forecast data available for this zipcode"]}
+            continue
 
-                if 'dt_txt' in forecast and 'weather' in forecast and forecast['weather']:
-                    date = forecast['dt_txt'].split()[0]
-                    time = forecast['dt_txt'].split()[1]
+        for forecast in forecasts :
+            dt = forecast.get("dt_txt", "")
+            date, time = dt.split() if " " in dt else ("Unknown", "Unknown")
 
-                    if date not in human_readable_data[zipcode]:
-                        human_readable_data[zipcode][date] = []
-
-
-                    if 'description' in forecast['weather'][0]:
-                        human_readable_data[zipcode][date].append(f"{time}: {forecast['weather'][0]['description']}")
-                    else:
-                        human_readable_data[zipcode][date].append(f"{time}: No description available")
-                        logger.warning(f"No weather description available for {zipcode} at {date} {time}")
-                else:
-                     if zipcode not in human_readable_data:
-                         human_readable_data[zipcode] = {}
-                     if 'No forecast data available' not in human_readable_data[zipcode]:
-                         human_readable_data[zipcode]['No forecast data available'] = ["No forecast data available for this time."]
-                         logger.warning(f"Missing dt_txt or weather key for forecast in zipcode {zipcode}")
+            temp = forecast.get("main", {}).get("temp","N/A")
+            weather_info = forecast.get("weather",[{}])[0]
+            main = weather_info.get("main", "N/A")
+            desc = weather_info.get("description", "N/A")
 
 
-        else:
+            if date not in human_readable_data[zipcode]:
+                human_readable_data[zipcode][date] = []
+            
+            forecast_line = f"{time}: Temp: {temp}F | {main} - {desc}"
+            human_readable_data[zipcode][date].append(forecast_line)
 
-            human_readable_data[zipcode] = {"No forecast data available": ["No forecast data available for this zipcode."]}
-            logger.warning(f"'list' key missing or empty in weather data for zipcode {zipcode}.")
-
+            
     logger.info("Finished converting weather data to human readable format.")
     return human_readable_data
 
 
 def generate_message(user, all_human_readable_data):
-    message = f"Hello {user.name},\n\nHere is your weather forecast for the next 3 days:\n\n"
+    message = f"Hello {user.name},\n\nHere is your weather forecast for the day:\n\n"
     logger.info(f"Generating message for user: {user.name}")
     # Iterate through the user's zipcodes
     for zipcode in user.zipcodes:
 
+        message += f"Zipcode: {zipcode}\n"
+
         if zipcode in all_human_readable_data:
-            message += f"Weather for Zipcode {zipcode}:\n"
             user_weather_data = all_human_readable_data[zipcode]
+
             for date, forecasts in user_weather_data.items():
                 message += f"Date: {date}\n"
                 for forecast in forecasts:
-                    message += f"{forecast}\n"
+                    message += f" - {forecast}\n"
                 message += "\n"
             logger.info(f"Included weather data for zipcode {zipcode} in message for {user.name}")
         else:
@@ -91,4 +87,5 @@ def generate_message(user, all_human_readable_data):
             logger.warning(f"No weather data available in human_readable_data for user {user.name}'s zipcode {zipcode}")
 
     logger.info(f"Message generated for user: {user.name}")
+    logger.info(message)
     return message
