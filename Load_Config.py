@@ -6,7 +6,7 @@ from Logger import logger # Import the logger
 #this module when called loads a dictionary from a yaml configuration file using a relational path and generates singleton classes for use in the other .py modules
 
 def load_config():
-  cwd = os.getcwd()
+  cwd = os.path.dirname(os.path.abspath(__file__))
 
   config_path = os.path.join(cwd,"Config",'weather_config.yml')
 
